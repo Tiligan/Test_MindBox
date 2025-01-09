@@ -1,0 +1,54 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-app
+  labels:
+    app: {{ .Release.Name }}-deployment
+    stage: test
+    owner: nikita
+spec:
+  selector:
+    matchLabels:
+      project: {{ .Release.Name }}
+  minReadySeconds: {{ .Values.image.initTime }} # Время инициализации приложения 30 секунд
+  template:
+    metadata:
+     labels:
+      project: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Release.Name }}-container
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }} 
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          resources:
+            limits:
+              cpu: {{ .Values.image.cpuLimit }} # 0.5 CPU "значительно" больше для первых запросов
+              memory: {{ .Values.image.memLimit }} #128M
+            requests:
+              cpu: {{ .Values.image.cpuRequest }} # 0.1 CPU
+              memory: {{ .Values.image.memRequest }} #128M
+          ports:
+            - containerPort: {{ .Values.service.webAppPort }}
+            - containerPort: {{ .Values.image.probePort }} # Порт для проб
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.image.probePort }}
+            initialDelaySeconds: {{ .Values.image.initTime }} # Время инициализации приложения 30 секунд
+            periodSeconds: {{ .Values.image.readinessProbePeriod }} 
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.image.probePort }}
+            initialDelaySeconds: {{ .Values.image.livenessProbeDelay }}
+            periodSeconds: {{ .Values.image.livenessProbePeriod }}
+      affinity:  # Распределение по зонам кластера
+       podAntiAffinity:
+         preferredDuringSchedulingIgnoredDuringExecution:
+         - weight: 20
+           podAffinityTerm:
+             labelSelector:
+               matchExpressions:
+                 - key: app
+                   operator: In
+                   values:
+                     - {{ .Release.Name }}-app
+             topologyKey: topology.kubernetes.io/zone # Распределение по зонам кластера

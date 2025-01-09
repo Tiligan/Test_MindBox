@@ -1,0 +1,10 @@
+apiVersion : v2
+name       : k8s-helm
+description: My solution to the test task
+type       : application
+version    : 0.1.0
+appVersion : 1.16.0
+
+maintainers:
+  - name   : NikitaTertyschny
+    email  : nikita-tertyschny@yandex.ru

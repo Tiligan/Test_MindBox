@@ -1,0 +1,29 @@
+# Default Values for Helm Chart
+
+image:
+  repository          : tiligan/flasksqlite # Образ веб приложения
+  pullPolicy          : IfNotPresent # Настройка загрузки образа из реестра
+  tag                 : "latest" # Тег образа
+  cpuLimit            : "500m" # Наибольшая нагрузка на приложение
+  memLimit            : "128M" # Наибольшая требуемая память 
+  cpuRequest          : "100m" # 0.1CPU 
+  memRequest          : "128M" # Запрашиваемая память
+  probePort           : 5001 # Порт для работы проб
+  initTime            : 30 # Время инициализации приложения
+  readinessProbePeriod: 35 # Период пробы на готовность принимать трафик
+  livenessProbePeriod : 40 # Период пробы на дедлок
+  livenessProbeDelay  : 45 # Задержка пробы на дедлок
+
+hpa:
+  minRepl  : 2 # Минимальное количество реплик, поддерживаемое автоскейлингом
+  maxRepl  : 4 # Максимально допустимое количество реплик для автоскейлинга
+  cpuUtil  : 70 # Целевой уровень загрузки CPU (в процентах) для масштабирования
+  memUtil  : 85 # Целевой уровень использования памяти (в процентах) для масштабирования
+
+service:
+  enable     : true
+  name       : my-flask-service
+  type       : LoadBalancer # Тип сервиса
+  webAppPort : 80  #  Внешний порт, который открыт для клиентов на уровне сервиса
+  targetPort : 5000 # Внутренний порт, на который перенаправляется трафик внутри пода
+  protocol   : TCP  # Протокол

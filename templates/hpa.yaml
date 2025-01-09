@@ -1,0 +1,24 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ .Release.Name }}-autoscale
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ .Release.Name }}-app
+  minReplicas: {{ .Values.hpa.minRepl }} # Минимальное значение подов 2
+  maxReplicas: {{ .Values.hpa.maxRepl }} # Максимальное значение подов 4
+  metrics:
+  - type: Resource 
+    resource:
+      name: cpu # Контроль CPU для скейлинга
+      target:
+        type: Utilization
+        averageUtilization: {{ .Values.hpa.cpuUtil }} # Контрольное значение используемые ресурсы\запрашиваемые ресурсы
+  - type: Resource
+    resource:
+      name: memory # Контроль memory для скейлинга
+      target:
+        type: Utilization
+        averageUtilization: {{ .Values.hpa.memUtil }} # Контрольное значение используемые ресурсы\запрашиваемые ресурсы
