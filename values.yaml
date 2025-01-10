@@ -9,7 +9,7 @@ image:
   cpuRequest          : "100m" # 0.1CPU 
   memRequest          : "128M" # Запрашиваемая память
   probePort           : 5001 # Порт для работы проб
-  initTime            : 30 # Время инициализации приложения
+  initTime            : 10 # Время инициализации приложения
   readinessProbePeriod: 35 # Период пробы на готовность принимать трафик
   livenessProbePeriod : 40 # Период пробы на дедлок
   livenessProbeDelay  : 45 # Задержка пробы на дедлок
